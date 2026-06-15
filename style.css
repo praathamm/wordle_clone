@@ -1,0 +1,18 @@
+body{
+    background:#121213;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+    margin-top:100px;
+}
+
+input{
+    width:120px;
+    height:50px;
+    font-size:24px;
+    text-transform:uppercase;
+}
+
+button{
+    height:55px;
+}
