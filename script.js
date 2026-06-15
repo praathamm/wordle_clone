@@ -284,8 +284,7 @@ function onGuessComplete(result, guess) {
 
     setTimeout(() => {
       showModal({
-        title: "You Won!",
-        message: `You have won a coffee date tomorrow at ${COFFEE_TIME}. Would you like to go?`,
+        title: "You Win! (as always :p) Coffee today after work?",
         buttons: [
           { text: "Yes", onClick: openMaps },
           { text: "Yes", onClick: openMaps },
