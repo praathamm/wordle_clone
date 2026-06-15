@@ -7,6 +7,23 @@ const ANSWER = "manimau".toUpperCase(); // M A N I | M A U  -> 7 letters
 
 const WORD_LENGTH = ANSWER.length;
 
+// Coffee date details / link shown on a correct guess
+const COFFEE_TIME = "5:00 PM";
+const MAPS_LINK = "https://share.google/NmOT93fEmCqW35HKc";
+
+// ============================================================
+// DYNAMIC VIEWPORT HEIGHT (fixes mobile keyboard overflow)
+// ============================================================
+function setAppHeight() {
+  document.documentElement.style.setProperty("--app-height", `${window.innerHeight}px`);
+}
+setAppHeight();
+window.addEventListener("resize", setAppHeight);
+window.addEventListener("orientationchange", setAppHeight);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", setAppHeight);
+}
+
 // ============================================================
 // STATE
 // ============================================================
@@ -21,6 +38,10 @@ const tiles = Array.from(document.querySelectorAll(".tile"));
 const board = document.getElementById("board");
 const toastContainer = document.getElementById("toast-container");
 const keyButtons = Array.from(document.querySelectorAll(".key"));
+const helpButton = document.getElementById("help-button");
+const modalOverlay = document.getElementById("modal-overlay");
+const modalContent = document.getElementById("modal-content");
+const modalClose = document.getElementById("modal-close");
 
 // ============================================================
 // HELPERS
@@ -61,6 +82,64 @@ function shakeBoard() {
   board.classList.add("shake");
   setTimeout(() => board.classList.remove("shake"), 600);
 }
+
+// ============================================================
+// MODAL POPUP
+// ============================================================
+
+function showModal({ title, message, buttons = [], dismissible = true }) {
+  modalContent.innerHTML = "";
+
+  if (title) {
+    const h2 = document.createElement("h2");
+    h2.textContent = title;
+    modalContent.appendChild(h2);
+  }
+
+  if (message) {
+    const p = document.createElement("p");
+    p.textContent = message;
+    modalContent.appendChild(p);
+  }
+
+  if (buttons.length) {
+    const wrap = document.createElement("div");
+    wrap.className = "modal-buttons";
+    buttons.forEach((btn) => {
+      const b = document.createElement("button");
+      b.className = "modal-btn" + (btn.secondary ? " secondary" : "");
+      b.textContent = btn.text;
+      b.addEventListener("click", () => {
+        if (btn.onClick) btn.onClick();
+      });
+      wrap.appendChild(b);
+    });
+    modalContent.appendChild(wrap);
+  }
+
+  modalClose.style.display = dismissible ? "flex" : "none";
+  modalOverlay.classList.add("show");
+}
+
+function hideModal() {
+  modalOverlay.classList.remove("show");
+}
+
+modalClose.addEventListener("click", hideModal);
+modalOverlay.addEventListener("click", (e) => {
+  if (e.target === modalOverlay && modalClose.style.display !== "none") {
+    hideModal();
+  }
+});
+
+// Help / "?" button
+helpButton.addEventListener("click", () => {
+  showModal({
+    title: "How To Play",
+    message: "You already know the answer, Anushri 😉",
+    buttons: [{ text: "Got it", onClick: hideModal }],
+  });
+});
 
 // ============================================================
 // TYPING
@@ -204,14 +283,35 @@ function onGuessComplete(result, guess) {
     });
 
     setTimeout(() => {
-      const messages = ["Genius", "Magnificent", "Impressive", "Splendid", "Great", "Phew"];
-      showToast(messages[Math.floor(Math.random() * messages.length)], Infinity);
+      showModal({
+        title: "You Won!",
+        message: `You have won a coffee date tomorrow at ${COFFEE_TIME}. Would you like to go?`,
+        buttons: [
+          { text: "Yes", onClick: openMaps },
+          { text: "Yes", onClick: openMaps },
+        ],
+        dismissible: false,
+      });
     }, 800);
   } else {
-    showToast("Cmon now Anushri");
-    // allow the player to try again: clear the row after a short pause
-    setTimeout(resetRow, 1100);
+    showModal({
+      title: "Nope",
+      message: "Stop playing, Anushri 😏",
+      buttons: [
+        {
+          text: "OK",
+          onClick: () => {
+            hideModal();
+            resetRow();
+          },
+        },
+      ],
+    });
   }
+}
+
+function openMaps() {
+  window.open(MAPS_LINK, "_blank");
 }
 
 function resetRow() {
@@ -255,6 +355,8 @@ document.addEventListener("keydown", (e) => {
 });
 
 function handleKey(key) {
+  if (modalOverlay.classList.contains("show")) return;
+
   if (key === "enter") {
     submitGuess();
   } else if (key === "backspace" || key === "delete") {
