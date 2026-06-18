@@ -421,12 +421,12 @@ body {
   fill: var(--color-tone-1);
 }
 
-.modal-content h2 {
+..modal-content h2 {
   font-family: "nyt-karnakcondensed", "Helvetica Neue", Arial, sans-serif;
   font-size: 24px;
   letter-spacing: 0.03em;
   margin: 4px 0 16px 0;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .modal-content p {

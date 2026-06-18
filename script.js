@@ -1,15 +1,13 @@
 // ============================================================
 // CONFIG — change this to whatever answer you want.
-// Letters only (no spaces/hyphens) — the layout below
-// (4 boxes, gap, 3 boxes) is handled separately.
+// Letters only (no spaces/hyphens) — the layout is a single row of 6 tiles.
 // ============================================================
-const ANSWER = "manimau".toUpperCase(); // M A N I | M A U  -> 7 letters
+const ANSWER = "bangur".toUpperCase(); // B A N G U R  -> 6 letters
 
 const WORD_LENGTH = ANSWER.length;
 
-// Coffee date details / link shown on a correct guess
-const COFFEE_TIME = "5:00 PM";
-const MAPS_LINK = "https://share.google/NmOT93fEmCqW35HKc";
+// Winning link shown on a correct guess
+const MAPS_LINK = "https://www.youtube.com/watch?v=xvFZjo5PgG0";
 
 // ============================================================
 // DYNAMIC VIEWPORT HEIGHT (fixes mobile keyboard overflow)
@@ -30,6 +28,8 @@ if (window.visualViewport) {
 let currentGuess = []; // array of letters currently typed (max WORD_LENGTH)
 let isGameOver = false;
 let isRevealing = false; // true while flip animation is in progress
+let popcornCount = 1;
+let monsterCount = 2;
 
 // ============================================================
 // DOM REFERENCES
@@ -39,6 +39,8 @@ const board = document.getElementById("board");
 const toastContainer = document.getElementById("toast-container");
 const keyButtons = Array.from(document.querySelectorAll(".key"));
 const helpButton = document.getElementById("help-button");
+const statsButton = document.getElementById("stats-button");
+const settingsButton = document.getElementById("settings-button");
 const modalOverlay = document.getElementById("modal-overlay");
 const modalContent = document.getElementById("modal-content");
 const modalClose = document.getElementById("modal-close");
@@ -87,7 +89,7 @@ function shakeBoard() {
 // MODAL POPUP
 // ============================================================
 
-function showModal({ title, message, buttons = [], dismissible = true }) {
+function showModal({ title, message, buttons = [], dismissible = true, customNode = null }) {
   modalContent.innerHTML = "";
 
   if (title) {
@@ -100,6 +102,10 @@ function showModal({ title, message, buttons = [], dismissible = true }) {
     const p = document.createElement("p");
     p.textContent = message;
     modalContent.appendChild(p);
+  }
+
+  if (customNode) {
+    modalContent.appendChild(customNode);
   }
 
   if (buttons.length) {
@@ -136,10 +142,42 @@ modalOverlay.addEventListener("click", (e) => {
 helpButton.addEventListener("click", () => {
   showModal({
     title: "How To Play",
-    message: "You already know the answer, Anushri 😉",
+    message: "swas1 swas2",
     buttons: [{ text: "Got it", onClick: hideModal }],
   });
 });
+
+statsButton.addEventListener("click", showScoreModal);
+settingsButton.addEventListener("click", showScoreModal);
+
+function showScoreModal() {
+  const table = document.createElement("table");
+  table.style.margin = "0 auto";
+  table.style.borderCollapse = "collapse";
+  table.style.fontSize = "16px";
+
+  const row1 = table.insertRow();
+  const nameCell1 = row1.insertCell();
+  const scoreCell1 = row1.insertCell();
+  nameCell1.textContent = "Pratham";
+  scoreCell1.textContent = "1";
+  nameCell1.style.padding = "8px 12px";
+  scoreCell1.style.padding = "8px 12px";
+
+  const row2 = table.insertRow();
+  const nameCell2 = row2.insertCell();
+  const scoreCell2 = row2.insertCell();
+  nameCell2.textContent = "swas";
+  scoreCell2.textContent = "0";
+  nameCell2.style.padding = "8px 12px";
+  scoreCell2.style.padding = "8px 12px";
+
+  showModal({
+    title: "Score Table",
+    buttons: [{ text: "Close", onClick: hideModal }],
+    customNode: table,
+  });
+}
 
 // ============================================================
 // TYPING
@@ -284,7 +322,7 @@ function onGuessComplete(result, guess) {
 
     setTimeout(() => {
       showModal({
-        title: "You Win! (as always :p) Coffee today after work?",
+        title: "you win! (cuz this aint piano tiles :p) wanna go watch a movie some time?",
         buttons: [
           { text: "Yes", onClick: openMaps },
           { text: "Yes", onClick: openMaps },
@@ -294,8 +332,8 @@ function onGuessComplete(result, guess) {
     }, 800);
   } else {
     showModal({
-      title: "Nope",
-      message: "Stop playing, Anushri 😏",
+      title: "you owe",
+      message: `${popcornCount} caramel popcorn and ${monsterCount} white monster`,
       buttons: [
         {
           text: "OK",
@@ -306,6 +344,8 @@ function onGuessComplete(result, guess) {
         },
       ],
     });
+    popcornCount += 1;
+    monsterCount += 2;
   }
 }
 
